@@ -87,3 +87,15 @@ app.get('/movies/read/by-title',(req,res)=>{
 })
 
 
+/* step 7 */
+
+app.get('/movies/read/id/:id',(req,res)=>{
+    
+
+    if(req.params.id > movies.length){
+        res.json({status:404,error:true,message:`the movie ${req.params.id} does not exist`})
+    }
+    else{
+        res.json({status:200,data:movies[req.params.id-1]})
+    }
+})
