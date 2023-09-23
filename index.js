@@ -92,7 +92,7 @@ app.get('/movies/read/by-title',(req,res)=>{
 app.get('/movies/read/id/:id',(req,res)=>{
     
 
-    if(req.params.id > movies.length){
+    if(req.params.id > movies.length || id < 1){
         res.json({status:404,error:true,message:`the movie ${req.params.id} does not exist`})
     }
     else{
@@ -128,4 +128,18 @@ app.get('/movies/add',(req,res)=>{
     movies.push(newMovie)
 
     res.json({status:200,data:movies})
+})
+
+/* step 9 */
+
+app.get('/movies/delete/:id',(req,res)=>{
+    let id=req.params.id
+
+    if(id > movies.length || id < 1){
+        res.json({status:404,error:true,message:`the movie ${id} does not exist`})
+    }
+    else{
+        movies.splice(id,1)
+        res.json({status:200,data:movies})
+    }
 })
