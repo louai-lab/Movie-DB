@@ -140,6 +140,17 @@ app.get('/movies/delete/:id',(req,res)=>{
     }
     else{
         movies.splice(id,1)
-        res.json({status:200,data:movies})
+        res.json({status:200,data:movies});
     }
+})
+
+/* step 10 */
+
+app.get('/movies/update/:id',(req,res)=>{
+    let id=req.params.id;
+
+    movies[id-1].title = req.query.title;
+    movies[id-1].rating = req.query.rating;
+
+    res.json({status:200,data:movies})
 })
