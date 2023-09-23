@@ -56,18 +56,34 @@ const movies = [
     { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }]
 
 
-app.get("/movies/create", (req, res) => {
+// app.get("/movies/create", (req, res) => {
 
-});
+// });
 
 app.get("/movies/read", (req, res) => {
     res.json({status:200,data:movies})
 });
 
-app.get("/movies/update", (req, res) => {
+// app.get("/movies/update", (req, res) => {
 
-});
+// });
 
-app.get("/movies/delete", (req, res) => {
+// app.get("/movies/delete", (req, res) => {
 
-});
+// });
+
+/* step 6 */
+
+app.get('/movies/read/by-date',(req,res)=>{
+    res.json({status:200,data:movies.sort((a, b) => a.year - b.year)})
+})
+
+app.get('/movies/read/by-rating',(req,res)=>{
+    res.json({status:200,data:movies.sort((a, b) => b.rating - a.rating)})
+})
+
+app.get('/movies/read/by-title',(req,res)=>{
+    res.json({status:200,data:movies.sort((a,b)=>a.title.localeCompare(b.title))})
+})
+
+
