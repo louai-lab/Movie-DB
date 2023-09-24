@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser=require('body-parser'); // // Middleware for parsing request bodies
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -9,11 +10,49 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const port = 5000;
 
+//40wonTrYtXGOxTIv
+
+// mongoose.connect(
+//     "mongodb+srv://louaibaghdadi27:40wonTrYtXGOxTIv@cluster0.tafekgj.mongodb.net/?retryWrites=true&w=majority",
+//     ()=>{
+//       console.log("connected database successfully");
+//     }
+//   );
+
+////// step 12 starts
+
+  const dbUrl =
+  'mongodb+srv://louaibaghdadi27:40wonTrYtXGOxTIv@cluster0.tafekgj.mongodb.net/?retryWrites=true&w=majority';
+
+// Connect to MongoDB using async/await
+(async () => {
+  try {
+    await mongoose.connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log('Connected to MongoDB');
+
+    // Your Express routes and middleware here...
+
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+})();
+
+////// step 12 ends
+
+
+
 //http://localhost:5000/
 
-app.listen(port, () => {
-    console.log("Server ready")
-});
+// app.listen(port, () => {
+//     console.log("Server ready");
+// });
 
 
 // app.all('*', (req, res) => {
@@ -131,16 +170,12 @@ app.get('/movies/add',(req,res)=>{
 })
 
 app.post("/movies/add", (req, res) => {
+
       let title=req.body.title;
       let year=req.body.year;
-    //   let rating=req.body.rating;
       let rating=parseInt(req.body.rating);
 
-      //     if(req.query.title === "" || isNaN(req.query.year) || req.query.year.length != 4){
-//         res.json({status:403,error:true,message:'you cannot create a movie without providing a title and a year'});
-//     }else if (isNaN(rating) || rating > 10) {
-//         rating = 4;
-//     }
+
 
       if(title === "" || isNaN(year)){
         res.json({status:404,error:true,message:'you cannot create'})
@@ -218,4 +253,88 @@ app.put('/movies/update/:id',(req,res)=>{
 
 })
 
-/* step 11 */
+/* step 12 */
+
+const movieSchema = new mongoose.Schema({
+    title: {
+      type: String,
+      required: true,
+    },
+    year:{
+        type:Number,
+        required:true,
+    },
+    rating:{
+        type:Number,
+        required:true,
+    }
+  });
+  
+  const Movie = mongoose.model("Movie",movieSchema);
+
+app.post('/movies',(req,res)=>{
+    const movie = new Movie({
+        title:req.body.title,
+        year:req.body.year,
+        rating:req.body.rating
+    })
+
+    movie.save().then(
+        () => res.json({status:200,message:"added successfully"}),
+        (error) => res.json({status:404,error:true,message:"error"})
+    )
+})
+
+app.get('/movies', async (req, res) => {
+    try {
+      const allData = await Movie.find({}); 
+      res.json({status:200,data:allData}); 
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.json({status:200,error:true,message:"there is an error"})
+    }
+  });
+
+app.put('/movies/:id', async (req, res) => {
+    const id = req.params.id; 
+
+    try{
+        await Movie.findByIdAndUpdate(id,{$set:req.body});
+
+        if(Movie.findByIdAndUpdate()){
+            res.json({status:200,message:"updated successfully"})
+        }
+        else{
+            res.json({status:404,error:true,message:"error"})
+        }
+
+    } catch(err){
+        res.json({status:404,error:true,message:"big error"})
+    }
+});
+
+app.delete('/movies/:id',async(req,res)=>{
+    const id = req.params.id; 
+
+    try{
+        await Movie.findByIdAndRemove(id);
+
+        if(Movie.findByIdAndRemove()){
+            res.json({status:200,message:"removed successfully"})
+        }
+        else{
+            res.json({status:404,error:true,message:"error"})
+        }
+
+    } catch(err){
+        res.json({status:404,error:true,message:"big error"})
+    }
+})
+
+
+  
+
+
+
+
+
