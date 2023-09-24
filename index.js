@@ -1,5 +1,12 @@
 const express = require('express');
+const bodyParser=require('body-parser'); // // Middleware for parsing request bodies
+
 const app = express();
+
+// Middleware to parse JSON and URL-encoded request bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const port = 5000;
 
 //http://localhost:5000/
@@ -100,20 +107,13 @@ app.get('/movies/read/id/:id',(req,res)=>{
     }
 })
 
-/* step 8 */
+/* step 8  + step 11 */
 
 app.get('/movies/add',(req,res)=>{
-    // const newMovie={
-    //     title:req.query.title,
-    //     year:req.query.year,
-    //     rating:req.query.rating
-    // }
-
+    
     let rating=parseInt(req.query.rating);
 
-    // let year=parseInt(req.query.year)
-
-    if(req.query.title === "" || isNaN(req.query.year) || req.query.year.length <= 3 ){
+    if(req.query.title === "" || isNaN(req.query.year) || req.query.year.length != 4){
         res.json({status:403,error:true,message:'you cannot create a movie without providing a title and a year'});
     }else if (isNaN(rating) || rating > 10) {
         rating = 4;
@@ -127,10 +127,40 @@ app.get('/movies/add',(req,res)=>{
 
     movies.push(newMovie)
 
-    res.json({status:200,data:movies})
+    res.json({status:200,data:movies});
 })
 
-/* step 9 */
+app.post("/movies/add", (req, res) => {
+      let title=req.body.title;
+      let year=req.body.year;
+    //   let rating=req.body.rating;
+      let rating=parseInt(req.body.rating);
+
+      //     if(req.query.title === "" || isNaN(req.query.year) || req.query.year.length != 4){
+//         res.json({status:403,error:true,message:'you cannot create a movie without providing a title and a year'});
+//     }else if (isNaN(rating) || rating > 10) {
+//         rating = 4;
+//     }
+
+      if(title === "" || isNaN(year)){
+        res.json({status:404,error:true,message:'you cannot create'})
+      }
+      else if(isNaN(rating) || rating > 10){
+        rating = 4;
+      }
+
+
+      const newMovie={
+        title:title,
+        year:year,
+        rating:rating
+      };
+
+      movies.push(newMovie);
+      res.json({status:200,data:movies});
+    });
+
+/* step 9   + step 11*/
 
 app.get('/movies/delete/:id',(req,res)=>{
     let id=req.params.id
@@ -144,7 +174,19 @@ app.get('/movies/delete/:id',(req,res)=>{
     }
 })
 
-/* step 10 */
+app.delete('/movies/delete/:id',(req,res) =>{
+    let id =req.params.id;
+
+    if( id > movies.length || id < 1){
+        res.json({status:404,error:true,message:`the movie ${id} does not exist`})
+    }
+    else{
+        movies.splice(id-1,1);
+        res.json({status:200,data:movies});
+    }
+})
+
+/* step 10  + step 11 */
 
 app.get('/movies/update/:id',(req,res)=>{
     let id=req.params.id;
@@ -154,3 +196,26 @@ app.get('/movies/update/:id',(req,res)=>{
 
     res.json({status:200,data:movies})
 })
+
+app.put('/movies/update/:id',(req,res)=>{
+    let id=req.params.id;
+
+    if(id > movies.length || id < 1){
+        res.json({status:404,error:true,message:`the movie ${id} does not exist`})
+    }
+
+    else if(req.body.title === "" || isNaN(req.body.year) || isNaN(req.body.rating)){
+        res.json({status:200,error:true,message:"enter the title , year and rating"})
+    }
+
+    else{
+        movies[id-1].title = req.body.title;
+        movies[id-1].year = req.body.year;
+        movies[id-1].rating = req.body.rating;
+
+        res.json({status:200,data:movies})
+    }
+
+})
+
+/* step 11 */
