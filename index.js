@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser=require('body-parser'); // // Middleware for parsing request bodies
 const mongoose = require('mongoose');
 
+const {auth} = require('./middlewares');
+
 const app = express();
 
 // Middleware to parse JSON and URL-encoded request bodies
@@ -9,15 +11,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const port = 5000;
-
-//40wonTrYtXGOxTIv
-
-// mongoose.connect(
-//     "mongodb+srv://louaibaghdadi27:40wonTrYtXGOxTIv@cluster0.tafekgj.mongodb.net/?retryWrites=true&w=majority",
-//     ()=>{
-//       console.log("connected database successfully");
-//     }
-//   );
 
 ////// step 12 starts
 
@@ -33,11 +26,9 @@ const port = 5000;
     });
 
     console.log('Connected to MongoDB');
-
-    // Your Express routes and middleware here...
-
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
+
     });
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
@@ -178,12 +169,11 @@ app.post("/movies/add", (req, res) => {
 
 
       if(title === "" || isNaN(year)){
-        res.json({status:404,error:true,message:'you cannot create'})
+        res.json({status:404,error:true,message:'you cannot create'});
       }
       else if(isNaN(rating) || rating > 10){
         rating = 4;
       }
-
 
       const newMovie={
         title:title,
@@ -272,7 +262,7 @@ const movieSchema = new mongoose.Schema({
   
   const Movie = mongoose.model("Movie",movieSchema);
 
-app.post('/movies',(req,res)=>{
+app.post('/movies',auth,(req,res)=>{
     const movie = new Movie({
         title:req.body.title,
         year:req.body.year,
@@ -285,7 +275,8 @@ app.post('/movies',(req,res)=>{
     )
 })
 
-app.get('/movies', async (req, res) => {
+app.get('/movies',auth,async (req, res) => {
+
     try {
       const allData = await Movie.find({}); 
       res.json({status:200,data:allData}); 
@@ -295,7 +286,7 @@ app.get('/movies', async (req, res) => {
     }
   });
 
-app.put('/movies/:id', async (req, res) => {
+app.put('/movies/:id', auth,async (req, res) => {
     const id = req.params.id; 
 
     try{
@@ -313,7 +304,7 @@ app.put('/movies/:id', async (req, res) => {
     }
 });
 
-app.delete('/movies/:id',async(req,res)=>{
+app.delete('/movies/:id',auth,async(req,res)=>{
     const id = req.params.id; 
 
     try{
@@ -330,6 +321,13 @@ app.delete('/movies/:id',async(req,res)=>{
         res.json({status:404,error:true,message:"big error"})
     }
 })
+
+
+/* step 13 */
+
+
+
+
 
 
   
